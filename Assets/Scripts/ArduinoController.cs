@@ -1,33 +1,67 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.IO.Ports;
+using System.Threading;
 using UnityEngine.Audio;
 
 public class ArduinoController : MonoBehaviour
 {
-    SerialPort serialPort = new SerialPort("COM3", 9600); // Set to the correct COM port
+    private readonly SerialPort _serialPort = new("COM3", 9600); 
 
-    public AudioSource audioSourceRickRoll;  // Audio source for RickRoll song
-    public AudioSource audioSourceWhatIsLove;  // Audio source for What is Love song
+    private Thread _serialThread;
+    private bool _keepReading = true;
+    private string _serialMessage;
 
-    public AudioMixerGroup audioMixer;
-    private AudioSource currentAudioSource; // Reference to the current playing song
-    
+    public AudioSource audioSourceRickRoll; 
+    public AudioSource audioSourceWhatIsLove; 
+
+    private AudioSource _currentAudioSource;
     
 
     void Start()
     {
-        audioSourceRickRoll.outputAudioMixerGroup = audioMixer;
-        audioSourceWhatIsLove.outputAudioMixerGroup = audioMixer;
-        
-        if (!serialPort.IsOpen)
+        if (!_serialPort.IsOpen)
         {
-            serialPort.Open();  // Open the serial port
+            _serialPort.Open();
         }
+
+        _serialThread = new Thread(ReadFromSerial);
+        _serialThread.Start();
     }
 
     void Update()
     {
-        if (serialPort.IsOpen)
+        if (!string.IsNullOrEmpty(_serialMessage))
+        {
+            if (_serialMessage.Contains("Play"))
+            {
+                PlaySong(audioSourceRickRoll);
+            }
+            else if (_serialMessage.Contains("Pause"))
+            {
+                PauseSong(audioSourceRickRoll);
+            }
+            else if (_serialMessage.Contains("Fastf"))
+            {
+                FastForward(.5f);
+            }
+            else if (_serialMessage.Contains("Backf"))
+            {
+                FastBackward();
+            }
+            else if (_serialMessage.Contains("Rewind ON"))
+            {
+                Rewind(true);
+            }
+            else if (_serialMessage.Contains("Rewind OFF"))
+            {
+                Rewind(false);
+            }
+
+            _serialMessage = null;
+        }
+        
+        /*if (serialPort.IsOpen)
         {
             try
             {
@@ -56,58 +90,105 @@ public class ArduinoController : MonoBehaviour
             {
                 // Handle any serial port errors here
             }
+        }*/
+    }
+
+    void ReadFromSerial()
+    {
+        while (_keepReading && _serialPort.IsOpen)
+        {
+            try
+            {
+                string msg = _serialPort.ReadLine();
+
+                lock (this)
+                {
+                    _serialMessage = msg;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                throw;
+            }
         }
     }
 
-    void PlaySong(AudioSource newSong)
+    public void PlaySong(AudioSource newSong)
     {
         // If there is a song playing, pause it
-        if (currentAudioSource != null && currentAudioSource.isPlaying)
+        if (_currentAudioSource != null && _currentAudioSource.isPlaying)
         {
-            currentAudioSource.Pause();
+            _currentAudioSource.Pause();
         }
 
         // Set the new song to be the current one and play it
-        currentAudioSource = newSong;
-        currentAudioSource.Play();
+        _currentAudioSource = newSong;
+        _currentAudioSource.Play();
     }
 
-    void PauseSong(AudioSource song)
+    public void PauseSong(AudioSource song)
     {
         // If the current song is paused, it stays paused
-        if (currentAudioSource == song && currentAudioSource.isPlaying)
+        if (_currentAudioSource == song && _currentAudioSource.isPlaying)
         {
-            currentAudioSource.Pause();
+            _currentAudioSource.Pause();
         }
     }
 
-    void FastForward(float howMuchMore)
+    public void FastForward(float howMuchMore)
     {
-        if (currentAudioSource == null)
+        if (_currentAudioSource == null)
         {
-            currentAudioSource = audioSourceRickRoll;
+            _currentAudioSource = audioSourceRickRoll;
         }
         
-        currentAudioSource.pitch = 1.5f; 
-        audioMixer.audioMixer.SetFloat("pitchBend", 1f / 1.5f);
+        _currentAudioSource.pitch = 1 + howMuchMore; 
+        _currentAudioSource.outputAudioMixerGroup.audioMixer.SetFloat("pitchBend", 1f / _currentAudioSource.pitch);
     }
     
-    void FastBackward()
+    public void FastBackward()
     {
-        if (currentAudioSource == null)
+        if (_currentAudioSource == null)
         {
-            currentAudioSource = audioSourceRickRoll;
+            _currentAudioSource = audioSourceRickRoll;
         }
         
-        currentAudioSource.pitch = 1; 
-        audioMixer.audioMixer.SetFloat("pitchBend", 1f);
+        _currentAudioSource.pitch = 1; 
+        _currentAudioSource.outputAudioMixerGroup.audioMixer.SetFloat("pitchBend", 1f);
+    }
+
+    public void Rewind(bool t)
+    {
+        if (_currentAudioSource == null)
+        {
+            _currentAudioSource = audioSourceRickRoll; 
+        }
+        
+        if (t)
+        {
+            _currentAudioSource.pitch = -1;
+            _currentAudioSource.outputAudioMixerGroup.audioMixer.SetFloat("pitchBend", 1f);
+        }
+        else
+        {
+            _currentAudioSource.pitch = 1;
+            _currentAudioSource.outputAudioMixerGroup.audioMixer.SetFloat("pitchBend", 1f);
+        }
     }
 
     void OnApplicationQuit()
     {
-        if (serialPort.IsOpen)
+        _keepReading = false;
+
+        if (_serialThread.IsAlive)
         {
-            serialPort.Close(); // Close the serial port when the application quits
+            _serialThread.Join();
+        }
+    
+        if (_serialPort.IsOpen)
+        {
+            _serialPort.Close();
         }
     }
 }

@@ -17,7 +17,7 @@ AudioMixerController:
   m_UpdateMode: 0
   m_ExposedParameters:
   - guid: e5b405e0ca7ebfb408ff718778fef7ab
-    name: MyExposedParam
+    name: pitchBend
   m_AudioMixerGroupViews:
   - guids:
     - 5c229467ba3e5a64481cba4e8dded7bf
@@ -67,7 +67,8 @@ AudioMixerSnapshotController:
   m_Name: Snapshot
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: ff917e05bd6fb6b4d9bf8359082cd5e6
-  m_FloatValues: {}
+  m_FloatValues:
+    e5b405e0ca7ebfb408ff718778fef7ab: 1
   m_TransitionOverrides: {}
 --- !u!244 &3210463947924533164
 AudioMixerEffectController:
