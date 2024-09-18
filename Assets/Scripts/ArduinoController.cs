@@ -57,6 +57,10 @@ public class ArduinoController : MonoBehaviour
             {
                 Rewind(false);
             }
+            else if (_serialMessage.Contains("VolumePercentage:")) 
+            {
+                AdjustVolume(_serialMessage);
+            }
 
             _serialMessage = null;
         }
@@ -91,6 +95,24 @@ public class ArduinoController : MonoBehaviour
                 // Handle any serial port errors here
             }
         }*/
+    }
+    
+    void AdjustVolume(string message)
+    {
+        // Extract the volume value from the message
+        string[] parts = message.Split(' ');
+        
+        if (parts.Length == 2)
+        {
+            if (float.TryParse(parts[1], out var volume))
+            {
+                // Adjust the volume of the currently playing song
+                if (_currentAudioSource != null)
+                {
+                    _currentAudioSource.volume = volume / 100f; // Convert 0-100 to 0.0-1.0
+                }
+            }
+        }
     }
 
     void ReadFromSerial()
