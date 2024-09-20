@@ -139,33 +139,6 @@ public class CharacterMoveController : MonoBehaviour
             }
         }
 
-        /*if (Input.GetMouseButtonDown(0))
-        {
-            if (_isOnGround)
-            {
-                _isJumping = true;
-                sound.PlayJump();
-            }
-        }
-
-        _anim.SetBool("isOnGround", _isOnGround);
-        
-        // calculate score
-        int distancePassed = Mathf.FloorToInt(transform.position.x - _lastPositionX);
-        int scoreIncrement = Mathf.FloorToInt(distancePassed / scoringRatio);
-
-        if (scoreIncrement > 0)
-        {
-            score.IncreaseCurrentScore(scoreIncrement);
-            _lastPositionX += distancePassed;
-        }
-
-        // game over
-        if (transform.position.y < fallPositionY)
-        {
-            GameOver();
-        }*/
-
     }
 
     private void OnTriggerEnter2D(Collider2D other) 
