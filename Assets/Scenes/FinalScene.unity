@@ -134,10 +134,9 @@ GameObject:
   - component: {fileID: 4335210}
   - component: {fileID: 4335209}
   - component: {fileID: 4335211}
-  - component: {fileID: 4335212}
   - component: {fileID: 4335213}
-  - component: {fileID: 4335214}
   - component: {fileID: 4335215}
+  - component: {fileID: 4335216}
   m_Layer: 0
   m_Name: MC
   m_TagString: Player
@@ -257,33 +256,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.1314716, y: 1.8258879}
   m_EdgeRadius: 0
---- !u!50 &4335212
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4335208}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 210a5564ba719494d9921f305c922987, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!95 &4335213
 Animator:
   serializedVersion: 5
@@ -305,35 +277,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4335214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4335208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea8a97fd82aed3d479c01dd7d5355729, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ac: {fileID: 1151182388}
-  bgScroller: {fileID: 1218104807}
-  moveAccel: 2
-  maxSpeed: 4
-  fastForwardMult: 2
-  groundRaycastDistance: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
-  score: {fileID: 1545631391}
-  scoringRatio: 1
-  gameOverScreen: {fileID: 1719637747}
-  fallPositionY: -5
-  gameCamera: {fileID: 519420030}
-  coinText: {fileID: 270378934}
-  coinValue: 0
-  sp: {fileID: 1785472560}
 --- !u!61 &4335215
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -379,6 +322,28 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.19, y: 1.8678398}
   m_EdgeRadius: 0
+--- !u!114 &4335216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4335208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c6b4a16d3814e9a8d1115b57e79a473, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgScroller: {fileID: 1218104807}
+  normalSpeed: 5
+  fastForwardSpeed: 20
+  rewindSpeed: 5
+  isPaused: 1
+  isFastForwarding: 0
+  isRewinding: 0
+  score: 0
+  scoreText: {fileID: 491222382}
+  gameOverScreen: {fileID: 1719637747}
 --- !u!1 &25931995
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,13 +369,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25931995}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1479122216}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 259.5, y: -55.330963}
@@ -1568,7 +1533,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300002, guid: f0a961ac1b700834487771ba002b0a39, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 149ce5aafb0c1d3479e329c01f1778d9, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 977da8eaa4df9eb4a8ad546eaa6671f4, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -2396,6 +2361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 873b09d2fd554aa7acde7001a7e8ec26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 4335216}
   audioSourceRickRoll: {fileID: 534010668}
   movePlayer: 0
   platformDelta: 0
@@ -2539,6 +2505,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.21
+  offset: 0
+  player: {fileID: 4335210}
 --- !u!1 &1243973542
 GameObject:
   m_ObjectHideFlags: 0
@@ -3661,7 +3629,7 @@ MonoBehaviour:
   waktu: 0
   musuh: {fileID: 536151506}
   scriptMusuh: {fileID: 536151508}
-  spawnRateMusuh: 25
+  spawnRateMusuh: 0
   waktuSpawnMusuh: 5
   coin: {fileID: 5227521416692116095, guid: 84924913981ad3f489923028909bf6bc, type: 3}
   spawnRateCoin: 1

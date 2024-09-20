@@ -34,11 +34,11 @@ public class SpawnScript : MonoBehaviour
             waktu += Time.deltaTime;
         }
         
-        if(waktu > spawnRateMusuh && bisaSpawn){
-            waktuSpawnMusuh = Random.Range(5, 15);
-            spawnRateMusuh += waktuSpawnMusuh;
-            Spawn();
-        }
+        // if(waktu > spawnRateMusuh && bisaSpawn){
+        //     waktuSpawnMusuh = Random.Range(5, 15);
+        //     spawnRateMusuh += waktuSpawnMusuh;
+        //     Spawn();
+        // }
 
         if(waktuCoin > spawnRateCoin){
             waktuSpawnCoin = Random.Range(3, 8);

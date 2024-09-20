@@ -12,6 +12,8 @@ public class ArduinoController : MonoBehaviour
     private Thread _serialThread;
     private bool _keepReading = true;
     private string _serialMessage;
+    
+    public SimpleCharacterController playerController;
 
     public AudioSource audioSourceRickRoll;  
 
@@ -87,6 +89,12 @@ public class ArduinoController : MonoBehaviour
             if (_serialMessage.Contains("Play"))
             {
                 PlaySong(audioSourceRickRoll);
+
+                if (playerController != null)
+                {
+                    playerController.Play();
+                }
+                
                 movePlayer = true;
 
                 if (useImages)
@@ -97,6 +105,12 @@ public class ArduinoController : MonoBehaviour
             else if (_serialMessage.Contains("Pause"))
             {
                 PauseSong(audioSourceRickRoll);
+                
+                if (playerController != null)
+                {
+                    playerController.Pause();
+                }
+                
                 movePlayer = false;
                 
                 if (useImages)
@@ -107,6 +121,12 @@ public class ArduinoController : MonoBehaviour
             else if (_serialMessage.Contains("Fastf"))
             {
                 FastForward(.5f);
+                
+                if (playerController != null)
+                {
+                    playerController.FastForward(true);
+                }
+                
                 FastForwardPlayer = true;
                 
                 if (useImages)
@@ -117,11 +137,23 @@ public class ArduinoController : MonoBehaviour
             else if (_serialMessage.Contains("Backf"))
             {
                 FastBackward();
+                
+                if (playerController != null)
+                {
+                    playerController.FastForward(false);
+                }
+                
                 FastForwardPlayer = false;
             }
             else if (_serialMessage.Contains("Rewind ON"))
             {
                 Rewind(true);
+                
+                if (playerController != null)
+                {
+                    playerController.Rewind(true);
+                }
+                
                 RewindPlayer = true;
                 
                 if (useImages)
@@ -132,6 +164,12 @@ public class ArduinoController : MonoBehaviour
             else if (_serialMessage.Contains("Rewind OFF"))
             {
                 Rewind(false);
+                
+                if (playerController != null)
+                {
+                    playerController.Rewind(false);
+                }
+                
                 RewindPlayer = false;
             }
             else if (_serialMessage.Contains("VolumePercentage:")) 

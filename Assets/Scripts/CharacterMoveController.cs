@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterMoveController : MonoBehaviour
+public class gg : MonoBehaviour
 {
     [Header("Movement")] 
     public ArduinoController ac;
@@ -11,6 +11,9 @@ public class CharacterMoveController : MonoBehaviour
     public float maxSpeed;
     public float fastForwardMult = 2;
 
+    private bool _isPaused;
+    private bool _isRewinding;
+    
     private bool _isOnPlatform;
     private bool _isOnGround;
 
@@ -39,6 +42,9 @@ public class CharacterMoveController : MonoBehaviour
     private float _lastPositionX;
     private Rigidbody2D _rig;
     private Animator _anim;
+    
+    private float originalMoveAccel;
+    private float originalMaxSpeed;
 
     private float _camOffset;
     
@@ -46,6 +52,9 @@ public class CharacterMoveController : MonoBehaviour
     {
         _rig = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
+        
+        originalMoveAccel = moveAccel;
+        originalMaxSpeed = maxSpeed;
 
         if (ac != null)
         {
@@ -53,35 +62,43 @@ public class CharacterMoveController : MonoBehaviour
             {
                 if (ac.FastForwardPlayer)
                 {
-                    moveAccel *= fastForwardMult;
-                    maxSpeed *= fastForwardMult;
+                    moveAccel = originalMoveAccel * fastForwardMult;
+                    maxSpeed = originalMaxSpeed * fastForwardMult;
                 }
                 else
                 {
-                    moveAccel /= fastForwardMult;
-                    maxSpeed /= fastForwardMult;
+                    moveAccel = originalMoveAccel;
+                    maxSpeed = originalMaxSpeed;
                 }
             };
             
             ac.RewindChanged += delegate
             {
-                if (ac.RewindPlayer)
-                {
-                    moveAccel = -moveAccel;
-                    gameCamera.horizontalOffset = -gameCamera.horizontalOffset;
-                }
-                else
-                {
-                    moveAccel = Mathf.Abs(moveAccel);
-                    gameCamera.horizontalOffset = Mathf.Abs(gameCamera.horizontalOffset);
-                }
+                _isRewinding = ac.RewindPlayer;
             };
         }
     }
 
     void Update()
     {
-        if (ac != null && ac.movePlayer)
+        if (ac != null)
+        {
+            if (ac.movePlayer && !_isPaused)
+            {
+                MovePlayer();
+            }
+            else if (!ac.movePlayer && !_isPaused)
+            {
+                StopPlayer();
+            }
+
+            if (_isPaused)
+            {
+                StopPlayer();
+            }
+        }
+
+        /*if (ac != null && ac.movePlayer)
         {
             _anim.SetBool("isMoving", true);
             
@@ -137,9 +154,42 @@ public class CharacterMoveController : MonoBehaviour
             {
                 GameOver();
             }
-        }
+        }*/
 
     }
+    
+    private void MovePlayer()
+    {
+        _anim.SetBool("isMoving", true);
+
+        // Calculate score based on distance passed
+        int distancePassed = Mathf.FloorToInt(transform.position.x - _lastPositionX);
+        int scoreIncrement = Mathf.FloorToInt(distancePassed / scoringRatio);
+
+        if (scoreIncrement > 0)
+        {
+            score.IncreaseCurrentScore(scoreIncrement);
+            _lastPositionX += distancePassed;
+        }
+
+        // Move player forward or backward
+        Vector2 velocityVector = _rig.velocity;
+        float accel = _isRewinding ? -moveAccel : moveAccel;  // Invert acceleration if rewinding
+        velocityVector.x = Mathf.Clamp(velocityVector.x + accel * Time.deltaTime, -maxSpeed, maxSpeed);
+        _rig.velocity = velocityVector;
+
+        // Background and camera scrolling
+        bgScroller.speed = Mathf.Abs(velocityVector.x) / maxSpeed;  // Adjust background speed
+        gameCamera.horizontalOffset = Mathf.Sign(velocityVector.x) * Mathf.Abs(gameCamera.horizontalOffset);
+    }
+
+    private void StopPlayer()
+    {
+        _anim.SetBool("isMoving", false);
+        _rig.velocity = Vector2.zero;
+        bgScroller.speed = 0;
+    }
+
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
@@ -177,7 +227,7 @@ public class CharacterMoveController : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        if (ac == null)
+        /*if (ac == null)
         {
             // raycast ground
             RaycastHit2D hit = Physics2D.Raycast(transform.position, 
@@ -208,6 +258,13 @@ public class CharacterMoveController : MonoBehaviour
             _rig.velocity = velocityVector;
         }
         else if (ac != null && ac.movePlayer)
+        {
+            Vector2 velocityVector = _rig.velocity;
+            velocityVector.x = Mathf.Clamp(velocityVector.x + moveAccel * Time.deltaTime, 0.0f, maxSpeed);
+            _rig.velocity = velocityVector;
+        }*/
+        
+        if (ac != null && ac.movePlayer)
         {
             Vector2 velocityVector = _rig.velocity;
             velocityVector.x = Mathf.Clamp(velocityVector.x + moveAccel * Time.deltaTime, 0.0f, maxSpeed);
