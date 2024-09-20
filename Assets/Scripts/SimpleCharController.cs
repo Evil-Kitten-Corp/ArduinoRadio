@@ -55,6 +55,7 @@ public class SimpleCharacterController : MonoBehaviour
         if (other.CompareTag("Coin"))
         {
             // Increase score when colliding with a coin
+            Debug.Log("HIT A COIN YAY");
             score++;
             scoreText.text = "Score: " + score;
             Destroy(other.gameObject);
