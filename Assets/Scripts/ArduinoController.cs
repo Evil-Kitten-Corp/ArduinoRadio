@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using System.IO.Ports;
 using System.Threading;
-using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class ArduinoController : MonoBehaviour
 {
@@ -12,17 +13,67 @@ public class ArduinoController : MonoBehaviour
     private bool _keepReading = true;
     private string _serialMessage;
 
-    public AudioSource audioSourceRickRoll; 
-    public AudioSource audioSourceWhatIsLove; 
+    public AudioSource audioSourceRickRoll;  
 
     private AudioSource _currentAudioSource;
-    
 
+    public Action FastForwardChanged;
+    public Action RewindChanged;
+
+    private bool _ff;
+    private bool _rp;
+
+    public bool FastForwardPlayer
+    {
+        get => _ff;
+
+        set
+        {
+            FastForwardChanged?.Invoke();
+            _ff = value;
+        }
+    }
+    
+    public bool RewindPlayer
+    {
+        get => _rp;
+
+        set
+        {
+            RewindChanged?.Invoke();
+            _rp = value;
+        }
+    }
+    
+    [HideInInspector] public bool movePlayer;
+    [HideInInspector] public float platformDelta;
+
+    public bool useImages;
+
+    [Header("Images")] 
+    public Image playButton;
+    public Image pauseButton;
+    public Image ffButton;
+    public Image rewindButton;
+
+    private Image[] _imgs;
+    
     void Start()
     {
         if (!_serialPort.IsOpen)
         {
             _serialPort.Open();
+        }
+
+        if (useImages)
+        {
+            _imgs = new[]
+            {
+                playButton, 
+                pauseButton, 
+                ffButton, 
+                rewindButton
+            };
         }
 
         _serialThread = new Thread(ReadFromSerial);
@@ -36,26 +87,52 @@ public class ArduinoController : MonoBehaviour
             if (_serialMessage.Contains("Play"))
             {
                 PlaySong(audioSourceRickRoll);
+                movePlayer = true;
+
+                if (useImages)
+                {
+                    StartCoroutine(PlayImage(playButton));
+                }
             }
             else if (_serialMessage.Contains("Pause"))
             {
                 PauseSong(audioSourceRickRoll);
+                movePlayer = false;
+                
+                if (useImages)
+                {
+                    StartCoroutine(PlayImage(pauseButton));
+                }
             }
             else if (_serialMessage.Contains("Fastf"))
             {
                 FastForward(.5f);
+                FastForwardPlayer = true;
+                
+                if (useImages)
+                {
+                    StartCoroutine(PlayImage(ffButton));
+                }
             }
             else if (_serialMessage.Contains("Backf"))
             {
                 FastBackward();
+                FastForwardPlayer = false;
             }
             else if (_serialMessage.Contains("Rewind ON"))
             {
                 Rewind(true);
+                RewindPlayer = true;
+                
+                if (useImages)
+                {
+                    StartCoroutine(PlayImage(rewindButton));
+                }
             }
             else if (_serialMessage.Contains("Rewind OFF"))
             {
                 Rewind(false);
+                RewindPlayer = false;
             }
             else if (_serialMessage.Contains("VolumePercentage:")) 
             {
@@ -96,6 +173,18 @@ public class ArduinoController : MonoBehaviour
             }
         }*/
     }
+
+    IEnumerator PlayImage(Image i)
+    {
+        foreach (var img in _imgs)
+        {
+            img.gameObject.SetActive(false);
+        }
+        
+        i.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        i.gameObject.SetActive(false);
+    }
     
     void AdjustVolume(string message)
     {
@@ -111,6 +200,8 @@ public class ArduinoController : MonoBehaviour
                 {
                     _currentAudioSource.volume = volume / 100f; // Convert 0-100 to 0.0-1.0
                 }
+
+                platformDelta = volume;
             }
         }
     }
