@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class SimpleCharacterController : MonoBehaviour
 {
+    public Animator anim;
     public BackgroundScroller bgScroller;
     public float normalSpeed = 5f;
     public float fastForwardSpeed = 10f;
@@ -68,12 +69,14 @@ public class SimpleCharacterController : MonoBehaviour
     public void Play()
     {
         isPaused = false;
+        anim.SetBool("Pause", false);
         //bgScroller.Resume();
     }
 
     public void Pause()
     {
         isPaused = true;
+        anim.SetBool("Pause", true);
         //bgScroller.Pause();
     }
 

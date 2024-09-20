@@ -334,6 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c6b4a16d3814e9a8d1115b57e79a473, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 4335213}
   bgScroller: {fileID: 1218104807}
   normalSpeed: 5
   fastForwardSpeed: 20
@@ -2505,7 +2506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.21
-  offset: 0
+  offset: 3
   player: {fileID: 4335210}
 --- !u!1 &1243973542
 GameObject:

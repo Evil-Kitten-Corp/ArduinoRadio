@@ -22,7 +22,7 @@ public class BackgroundScroller : MonoBehaviour
 
     void Update() 
     { 
-        _renderer.material.mainTextureOffset = new Vector2(player.position.x - offset, 0f); 
+        _renderer.material.mainTextureOffset = new Vector2(player.position.x / offset, 0f); 
         
         //_renderer.material.mainTextureOffset = new Vector2(Time.time * speed, 0f);
     }
